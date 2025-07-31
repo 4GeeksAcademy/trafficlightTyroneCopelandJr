@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 export default function TrafficLight() {
   const [currLight, setCurrLight] = useState('green');
+  const [isAuto, setIsAuto] = useState(true); 
 
   const trafficState = {
     red: {
@@ -21,13 +22,22 @@ export default function TrafficLight() {
     },
   };
 
+
   useEffect(() => {
+    if (!isAuto) return;
+
     const timer = setTimeout(() => {
       setCurrLight(trafficState[currLight].next);
     }, trafficState[currLight].duration);
 
     return () => clearTimeout(timer);
-  }, [currLight]);
+  }, [currLight, isAuto]);
+
+  
+  const handleClick = (color) => {
+    setIsAuto(false);     
+    setCurrLight(color);    
+  };
 
   return (
     <>
@@ -36,20 +46,26 @@ export default function TrafficLight() {
           <div
             key={ind}
             className="box"
+            onClick={() => handleClick(color)} 
             style={{
               backgroundColor:
                 currLight === color ? trafficState[color].backgroundColor : 'gray',
+              cursor: 'pointer',
+              boxShadow: currLight === color ? '0 0 20px 5px ' + trafficState[color].backgroundColor : 'none'
             }}
           ></div>
         ))}
       </div>
 
       <button
-        onClick={() => setCurrLight(trafficState[currLight].next)}
+        onClick={() => {
+          setIsAuto(true);
+        }}
         style={{ marginTop: '20px' }}
       >
-        Next Light
+        Resume Auto Mode
       </button>
     </>
   );
 }
+
